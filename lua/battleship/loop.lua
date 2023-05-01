@@ -1,4 +1,9 @@
+local Board = require("battleship.board")
+
 --- @class Game
+--- @field difficulty string
+--- @field boards table
+--- @field is_player_turn boolean
 local Game = {}
 
 --- @class GameOptions
@@ -12,6 +17,12 @@ function Game:new(options)
     local difficulty = options.difficulty or "medium"
     local data = {
         difficulty = difficulty,
+        boards = {
+            player = Board:new("Your Board"),
+            cpu = Board:new("CPU's Board"),
+            player_attack = Board:new("Attack Board", true),
+        },
+        is_player_turn = true,
     }
     setmetatable(data, self)
     self.__index = self
@@ -21,6 +32,7 @@ end
 
 function Game:start()
     print("Start game")
+    print(vim.inspect(self.boards.player))
 end
 
 function Game:loop()
