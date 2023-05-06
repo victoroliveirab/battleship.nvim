@@ -19,7 +19,7 @@ end
 ---Reads the prompt until a CR is emitted
 ---@param on_submit function callback function to run after submission
 function PromptInterface:read(on_submit)
-    vim.cmd("startinsert")
+    vim.api.nvim_feedkeys("i", "n", true)
     vim.keymap.set("i", "<CR>", function()
         local content = read_buffer(self.buf)
         vim.cmd("stopinsert")
