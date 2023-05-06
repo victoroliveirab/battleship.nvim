@@ -41,7 +41,6 @@ function Game:new(options)
     }
     setmetatable(data, self)
     self.__index = self
-    print("Created game")
     return data
 end
 
@@ -73,26 +72,38 @@ function Game:loop()
             local row = string.upper(coordinates.row)
             local col = coordinates.col + 1
             local status = attack_board:guess(row, col)
-            print(vim.inspect(status))
             if not status then
                 return self:loop()
             end
+            local size = status.hit
             if status.game_over then
+                self:handle_hit(row, col, tostring(size))
                 return self:handle_game_over()
             end
-            if status.hit == 0 then
-                self.is_player_turn = false
+            self.is_player_turn = false
+            if size == 0 then
                 self:handle_miss(row, col)
                 return self:loop()
             end
 
-            self.is_player_turn = false
-            local size = status.hit
             self:handle_hit(row, col, tostring(size))
             return self:loop()
         end)
     else
-        print("CPU time")
+        -- For now: just pick a random spot
+        local attack_board = self.boards.cpu.attack
+        while true do
+            local row = constants.BOARD_ROWS[math.random(1, 10)]
+            local col = math.random(1, 10)
+            local status = attack_board:guess(row, col)
+            if status then
+                if status.game_over then
+                    return self:handle_game_over()
+                end
+                self.is_player_turn = true
+                return self:loop()
+            end
+        end
     end
 end
 
