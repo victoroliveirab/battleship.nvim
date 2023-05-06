@@ -28,7 +28,9 @@ end
 function AttackBoard:guess(row, col)
     local spot = self.state[row][col]
     if spot == "." then
-        return self.opposite:hit(row, col)
+        local status = self.opposite:hit(row, col)
+        self.state[row][col] = status.hit == 0 and "~" or tostring(status.hit)
+        return status
     else
         print("Spot already chosen before")
         return false
