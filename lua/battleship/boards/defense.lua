@@ -9,7 +9,8 @@ setmetatable(DefenseBoard, { __index = Board })
 function DefenseBoard:new(opts)
     local instance = Board:new(vim.tbl_extend("force", opts, { empty = false }))
     instance = vim.tbl_extend("force", instance, {
-        hits = { 0, 0, 0, 0, 0 },
+        -- hits = { 0, 0, 0, 0, 0 },
+        hits = { 0, 0, 0 },
     })
     setmetatable(instance, { __index = DefenseBoard })
     return instance
@@ -46,7 +47,8 @@ end
 
 function DefenseBoard:check_game_over()
     for index, value in ipairs(self.hits) do
-        if index > 1 and index > value then
+        -- if index > 1 and index > value then
+        if index > 2 and index > value then -- return to old logic, this is only to make game over faster
             return false
         end
     end
