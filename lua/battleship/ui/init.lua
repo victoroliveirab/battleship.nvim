@@ -46,4 +46,8 @@ function Interface:show()
     self.win = vim.api.nvim_open_win(self.buf, true, self.opts)
 end
 
+function Interface:clear()
+    vim.api.nvim_buf_set_lines(self.buf, 0, vim.api.nvim_buf_line_count(self.buf), true, { "" })
+end
+
 return Interface

@@ -23,5 +23,13 @@ return {
             row = 27,
             col = 10,
         },
+        ---@type UiDefaultOpts
+        LOG_DEFAULT_OPTS = {
+            height = 23,
+            width = 30,
+            row = 5,
+            col = 58,
+        },
     },
+    SHIPS_NAMES = { [2] = "Destroyer", [3] = "Submarine", [4] = "Battleship", [5] = "Carrier" },
 }

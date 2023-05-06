@@ -2,6 +2,7 @@ local AttackBoard = require("battleship.boards.attack")
 local DefenseBoard = require("battleship.boards.defense")
 local BoardUI = require("battleship.ui.board")
 local PromptUI = require("battleship.ui.prompt")
+local LogUI = require("battleship.ui.log")
 
 local constants = require("battleship.constants")
 
@@ -9,7 +10,7 @@ local constants = require("battleship.constants")
 ---@field difficulty string
 ---@field boards { player: { attack: AttackBoard, defense: DefenseBoard }, cpu: { attack: AttackBoard, defense: DefenseBoard } }
 ---@field is_player_turn boolean
----@field ui { board: BoardInterface, prompt: PromptInterface }
+---@field ui { board: BoardInterface, prompt: PromptInterface, log: LogInterface }
 local Game = {}
 
 ---@class GameOptions
@@ -37,6 +38,7 @@ function Game:new(options)
         ui = {
             board = BoardUI:new(constants.UI.BOARD_DEFAULT_OPTS),
             prompt = PromptUI:new(constants.UI.PROMPT_DEFAULT_OPTS),
+            log = LogUI:new(constants.UI.LOG_DEFAULT_OPTS),
         },
     }
     setmetatable(data, self)
@@ -48,6 +50,7 @@ function Game:start()
     self.boards.player.attack:set_opposite(self.boards.cpu.defense)
     self.boards.cpu.attack:set_opposite(self.boards.player.defense)
 
+    self.ui.log:show()
     self.ui.board:show()
     self.ui.prompt:show()
 
@@ -63,6 +66,7 @@ function Game:start()
 end
 
 function Game:loop()
+    local log_ui = self.ui.log
     local board_ui = self.ui.board
     local prompt_ui = self.ui.prompt
 
@@ -83,10 +87,12 @@ function Game:loop()
             end
             self.is_player_turn = false
             if size == 0 then
+                log_ui:print("Player miss on " .. row .. tostring(col - 1))
                 self:handle_miss(row, col)
                 return self:loop()
             end
 
+            log_ui:print("Player hit on " .. row .. tostring(col - 1))
             self:handle_hit(row, col, tostring(size))
             return self:loop()
         end)
@@ -94,26 +100,33 @@ function Game:loop()
         -- For now: just pick a random spot
         local attack_board = self.boards.cpu.attack
 
-        while true do
-            local row = constants.BOARD_ROWS[math.random(1, 10)]
-            local col = math.random(1, 10)
-            local status = attack_board:guess(row, col)
+        local row, col, status
+        while not status do
+            row = constants.BOARD_ROWS[math.random(1, 10)]
+            col = math.random(1, 10)
+            status = attack_board:guess(row, col)
             if status then
                 if status.game_over then
                     return self:handle_game_over()
                 end
-                self.is_player_turn = true
-                return self:loop()
             end
         end
+
+        local size = status.hit
+        local result = size == 0 and "miss" or "hit"
+        log_ui:print("CPU " .. result .. " on " .. row .. tostring(col - 1))
+
+        self.is_player_turn = true
+        return self:loop()
     end
 end
 
 function Game:handle_game_over()
+    local log_ui = self.ui.log
     if self.is_player_turn then
-        print("YOU WON!!!")
+        log_ui:print("Player wins!")
     else
-        print("you lost :(")
+        log_ui:print("CPU wins.")
     end
 end
 
@@ -130,9 +143,12 @@ end
 function Game:close()
     local board_ui = self.ui.board
     local prompt_ui = self.ui.prompt
+    local log_ui = self.ui.log
 
+    vim.api.nvim_win_close(log_ui.win, true)
     vim.api.nvim_win_close(board_ui.win, true)
     vim.api.nvim_win_close(prompt_ui.win, true)
+    vim.api.nvim_buf_delete(log_ui.buf, { force = true })
     vim.api.nvim_buf_delete(board_ui.buf, { force = true })
     vim.api.nvim_buf_delete(prompt_ui.buf, { force = true })
 end
