@@ -1,3 +1,5 @@
+local utils = require("battleship.utils")
+
 --- @class BoardState
 local initial_board = {
     A = { ".", ".", ".", ".", ".", ".", ".", ".", ".", "." },
@@ -45,7 +47,8 @@ Board.__index = Board
 function Board:new(options)
     options = options or {}
     local name = options.name or "Board"
-    local state = options.initial_state or (options.empty and initial_board or generate_board())
+    local state = options.initial_state
+        or utils.deepcopy(options.empty and initial_board or generate_board())
     return setmetatable({ state = state, name = name }, self)
 end
 
