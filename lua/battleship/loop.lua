@@ -1,4 +1,5 @@
-local Board = require("battleship.board")
+local AttackBoard = require("battleship.boards.attack")
+local DefenseBoard = require("battleship.boards.defense")
 local BoardUI = require("battleship.ui.board")
 local PromptUI = require("battleship.ui.prompt")
 
@@ -23,9 +24,14 @@ function Game:new(options)
     local data = {
         difficulty = difficulty,
         boards = {
-            player = Board:new("Your Board"),
-            cpu = Board:new("CPU's Board"),
-            player_attack = Board:new("Attack Board", true),
+            player = {
+                attack = AttackBoard:new({ name = "Attack Board" }),
+                defense = DefenseBoard:new({ name = "Your Board" }),
+            },
+            cpu = {
+                attack = AttackBoard:new({ name = "CPU Attack Board" }),
+                defense = DefenseBoard:new({ name = "CPU Defense Board" }),
+            },
         },
         is_player_turn = true,
         ui = {
@@ -40,6 +46,9 @@ function Game:new(options)
 end
 
 function Game:start()
+    self.boards.player.attack:set_opposite(self.boards.cpu.defense)
+    self.boards.cpu.attack:set_opposite(self.boards.player.defense)
+
     self.ui.board:show()
     self.ui.prompt:show()
 
@@ -55,11 +64,54 @@ function Game:start()
 end
 
 function Game:loop()
+    local board_ui = self.ui.board
+    local prompt_ui = self.ui.prompt
     if self.is_player_turn then
-        print("Player time")
+        local attack_board = self.boards.player.attack
+        board_ui:print_board(attack_board, constants.BOARD_ROWS)
+        prompt_ui:read(function(coordinates)
+            local row = string.upper(coordinates.row)
+            local col = coordinates.col + 1
+            local status = attack_board:guess(row, col)
+            print(vim.inspect(status))
+            if not status then
+                return self:loop()
+            end
+            if status.game_over then
+                return self:handle_game_over()
+            end
+            if status.hit == 0 then
+                self.is_player_turn = false
+                self:handle_miss(row, col)
+                return self:loop()
+            end
+
+            self.is_player_turn = false
+            local size = status.hit
+            self:handle_hit(row, col, tostring(size))
+            return self:loop()
+        end)
     else
         print("CPU time")
     end
+end
+
+function Game:handle_game_over()
+    if self.is_player_turn then
+        print("YOU WON!!!")
+    else
+        print("you lost :(")
+    end
+end
+
+function Game:handle_miss(row, col)
+    local board_ui = self.ui.board
+    board_ui:update_board(row, col, "~")
+end
+
+function Game:handle_hit(row, col, value)
+    local board_ui = self.ui.board
+    board_ui:update_board(row, col, value)
 end
 
 function Game:close()
