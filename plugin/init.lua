@@ -1,5 +1,4 @@
 local Game = require("battleship.loop")
-print("Hello from '/plugin/init.lua' in battleship")
 
 vim.api.nvim_create_user_command("Battleship", function()
     require("battleship").setup()

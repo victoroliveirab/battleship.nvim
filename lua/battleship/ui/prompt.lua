@@ -1,14 +1,19 @@
 local Interface = require("battleship.ui")
 
+---@class PromptInterface: Interface
 local PromptInterface = {}
 setmetatable(PromptInterface, { __index = Interface })
 
----@param buffer number
+---Reads the whole line
+---@param buffer number Buffer handler
+---@return string line Line's content
 local read_buffer = function(buffer)
     return vim.api.nvim_buf_get_lines(buffer, 0, 1, false)[1]
 end
 
+---Creates a new prompt interface
 ---@param opts InterfaceOptions
+---@return Interface
 function PromptInterface:new(opts)
     local instance = Interface:new(opts)
     setmetatable(instance, { __index = PromptInterface })
@@ -18,6 +23,7 @@ end
 
 ---Reads the prompt until a CR is emitted
 ---@param on_submit function callback function to run after submission
+---@return nil
 function PromptInterface:read(on_submit)
     vim.api.nvim_feedkeys("i", "n", true)
     vim.keymap.set("i", "<CR>", function()

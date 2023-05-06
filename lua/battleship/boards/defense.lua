@@ -1,7 +1,6 @@
 local Board = require("battleship.boards")
 
----@class DefenseBoard
----@field state BoardState
+---@class DefenseBoard: Board
 ---@field hits number[]
 local DefenseBoard = {}
 setmetatable(DefenseBoard, { __index = Board })

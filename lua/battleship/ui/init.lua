@@ -22,6 +22,7 @@ local default_opts = {
     col = 1,
     style = "minimal",
 }
+---Creates a new interface
 ---@param opts InterfaceOptions
 ---@return Interface
 function Interface:new(opts)
@@ -36,6 +37,8 @@ end
 
 -- Borders: [ "╔", "═" ,"╗", "║", "╝", "═", "╚", "║" ].
 
+---Shows interface to the user
+---@return nil
 function Interface:show()
     if self.win then
         vim.api.nvim_win_close(self.win, true)

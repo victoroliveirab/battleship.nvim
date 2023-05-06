@@ -5,19 +5,19 @@ local PromptUI = require("battleship.ui.prompt")
 
 local constants = require("battleship.constants")
 
---- @class Game
---- @field difficulty string
---- @field boards table
---- @field is_player_turn boolean
---- @field ui table
+---@class Game
+---@field difficulty string
+---@field boards { player: { attack: AttackBoard, defense: DefenseBoard }, cpu: { attack: AttackBoard, defense: DefenseBoard } }
+---@field is_player_turn boolean
+---@field ui { board: BoardInterface, prompt: PromptInterface }
 local Game = {}
 
---- @class GameOptions
---- @field difficulty string?
+---@class GameOptions
+---@field difficulty string?
 
---- Creates a new game
---- @param options table?
---- @return Game
+---Creates a new game
+---@param options table?
+---@return Game
 function Game:new(options)
     options = options or {}
     local difficulty = options.difficulty or "medium"
@@ -65,6 +65,7 @@ end
 function Game:loop()
     local board_ui = self.ui.board
     local prompt_ui = self.ui.prompt
+
     if self.is_player_turn then
         local attack_board = self.boards.player.attack
         board_ui:print_board(attack_board, constants.BOARD_ROWS)
@@ -92,6 +93,7 @@ function Game:loop()
     else
         -- For now: just pick a random spot
         local attack_board = self.boards.cpu.attack
+
         while true do
             local row = constants.BOARD_ROWS[math.random(1, 10)]
             local col = math.random(1, 10)

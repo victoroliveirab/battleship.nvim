@@ -1,4 +1,8 @@
--- Source: http://lua-users.org/wiki/CopyTable
+---Source: http://lua-users.org/wiki/CopyTable
+---Creates a deepcopy of a data structure
+---@generic T
+---@param orig T
+---@return T
 local function deepcopy(orig)
     local orig_type = type(orig)
     local copy
