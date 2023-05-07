@@ -46,21 +46,32 @@ function Game:new(options)
     return data
 end
 
-function Game:start()
+function Game:configure()
     self.boards.player.attack:set_opposite(self.boards.cpu.defense)
     self.boards.cpu.attack:set_opposite(self.boards.player.defense)
-
-    self.ui.log:show()
-    self.ui.board:show()
-    self.ui.prompt:show()
 
     vim.api.nvim_create_autocmd("BufLeave", {
         buffer = self.ui.prompt.buf,
         callback = function()
-            self:close()
+            pcall(function()
+                self:close()
+            end)
             return true
         end,
     })
+
+    vim.keymap.set("n", "<Esc>", function()
+        self:close()
+        return true
+    end, { buffer = self.ui.prompt.buf, silent = true })
+end
+
+function Game:start()
+    self:configure()
+
+    self.ui.log:show()
+    self.ui.board:show()
+    self.ui.prompt:show()
 
     self:loop()
 end
