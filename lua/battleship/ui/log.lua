@@ -1,7 +1,10 @@
 local Interface = require("battleship.ui")
 
 ---@class LogInterface: Interface
-local LogInterface = {}
+local LogInterface = {
+    min_width = 30,
+    min_height = 1,
+}
 setmetatable(LogInterface, { __index = Interface })
 
 ---Creates a new Log Interface

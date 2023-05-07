@@ -2,7 +2,12 @@
 ---@field buf number
 ---@field win number
 ---@field opts InterfaceOptions
-local Interface = {}
+---@field min_height number
+---@field min_width number
+local Interface = {
+    min_width = 1,
+    min_height = 1,
+}
 local Interface_mt = { __index = Interface }
 
 ---@class InterfaceOptions
@@ -44,6 +49,16 @@ function Interface:show()
         vim.api.nvim_win_close(self.win, true)
     end
     self.win = vim.api.nvim_open_win(self.buf, true, self.opts)
+end
+
+---Resizes the interface
+---@param params { col: number, row: number }
+---@return nil
+function Interface:resize(params)
+    vim.api.nvim_win_set_config(
+        self.win,
+        { col = params.col, row = params.row, relative = "editor" }
+    )
 end
 
 function Interface:clear()

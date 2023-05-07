@@ -1,7 +1,10 @@
 local Interface = require("battleship.ui")
 
 ---@class PromptInterface: Interface
-local PromptInterface = {}
+local PromptInterface = {
+    min_width = 2,
+    min_height = 1,
+}
 setmetatable(PromptInterface, { __index = Interface })
 
 ---Reads the whole line

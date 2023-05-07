@@ -3,7 +3,11 @@ local Interface = require("battleship.ui")
 local constants = require("battleship.constants")
 
 ---@class BoardInterface: Interface
-local BoardInterface = {}
+local BoardInterface = {
+    min_width = 45,
+    -- TODO: alternate between 11 and 20 to extended and condensed versions
+    min_height = 20,
+}
 setmetatable(BoardInterface, { __index = Interface })
 
 local padding = 3
