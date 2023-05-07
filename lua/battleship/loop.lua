@@ -121,6 +121,36 @@ function Game:loop()
     end
 end
 
+function Game:on_resize()
+    local client = vim.api.nvim_list_uis()[1]
+    local new_height = client.height
+    local new_width = client.width
+
+    local board_min_width = self.ui.board.min_width
+    local log_min_width = self.ui.log.min_width
+
+    local board_min_height = self.ui.board.min_height
+    local prompt_min_height = self.ui.prompt.min_height
+
+    local min_width = board_min_width + log_min_width + 2
+    local min_height = board_min_height + prompt_min_height + 2
+
+    -- Takes paddings into account
+    if new_width < min_width then
+        error("UI too narrow for battleship.nvim", 2)
+    end
+    if new_height < min_height then
+        error("UI too short for battleship.nvim", 2)
+    end
+
+    local padding_left = math.floor((new_width - min_width) / 2)
+    local padding_top = math.min(5, math.floor((new_height - min_height) / 2))
+
+    self.ui.board:resize({ col = padding_left, row = padding_top })
+    self.ui.prompt:resize({ col = padding_left, row = padding_top + board_min_height + 2 })
+    self.ui.log:resize({ col = padding_left + board_min_width + 2, row = padding_top })
+end
+
 function Game:handle_game_over()
     local log_ui = self.ui.log
     if self.is_player_turn then
