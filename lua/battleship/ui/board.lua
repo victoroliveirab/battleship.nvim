@@ -28,11 +28,11 @@ end
 ---@param opts InterfaceOptions
 ---@return Interface
 function BoardInterface:new(opts)
-    local options = vim.tbl_extend(
-        "force",
-        opts,
-        { focusable = false, title = " Attack Board ", title_pos = "center" }
-    )
+    local options = vim.tbl_extend("force", opts, {
+        focusable = false,
+        title = " Attack Board ",
+        title_pos = "center",
+    })
     local instance = Interface:new(options)
     setmetatable(instance, { __index = BoardInterface })
     return instance
@@ -50,6 +50,9 @@ end
 ---@param rows string[]
 ---@return nil
 function BoardInterface:print_board(board, rows)
+    -- local ns = vim.api.nvim_create_namespace(constants.BATTLESHIP_NAMESPACE)
+    -- vim.api.nvim_buf_set_lines(self.buf, 0, 1, false, { "HEADER" })
+    -- vim.api.nvim_buf_add_highlight(self.buf, ns, "BoardMiss", 0, 1, -1)
     local board_lines = { padding_str .. "| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |" }
     for index, row in ipairs(rows) do
         table.insert(board_lines, " " .. row .. " | ")
@@ -70,6 +73,15 @@ function BoardInterface:update_board(row, col, value)
     local row_index = get_row_index(row) + 1
     local col_index = (padding + 1) * col + 1
     vim.api.nvim_buf_set_text(self.buf, row_index, col_index, row_index, col_index + 1, { value })
+    local ns = vim.api.nvim_create_namespace(constants.BATTLESHIP_NAMESPACE)
+    vim.api.nvim_buf_add_highlight(
+        self.buf,
+        ns,
+        value == "~" and "BoardMiss" or "BoardHit",
+        row_index,
+        col_index,
+        col_index + 1
+    )
 end
 
 ---Updates title of the window

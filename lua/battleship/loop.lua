@@ -82,17 +82,16 @@ function Game:start()
     self.ui.board:show()
     self.ui.prompt:show()
 
+    self.ui.board:print_board(self.boards.player.attack, constants.BOARD_ROWS)
     self:loop()
 end
 
 function Game:loop()
     local log_ui = self.ui.log
-    local board_ui = self.ui.board
     local prompt_ui = self.ui.prompt
 
     if self.is_player_turn then
         local attack_board = self.boards.player.attack
-        board_ui:print_board(attack_board, constants.BOARD_ROWS)
         prompt_ui:read(function(coordinates)
             local row = string.upper(coordinates.row)
             local col = coordinates.col + 1

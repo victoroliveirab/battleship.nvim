@@ -1,5 +1,6 @@
 return {
     BATTLESHIP_AUTO_GROUP = "BattleshipAuGroup",
+    BATTLESHIP_NAMESPACE = "BattleshipNamespace",
     ---@type string[]
     BOARD_ROWS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" },
     UI = {

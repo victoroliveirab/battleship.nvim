@@ -1,5 +1,10 @@
 local constants = require("battleship.constants")
 
+local highlight_groups = {
+    BoardHit = { fg = "#00ff00" },
+    BoardMiss = { fg = "#ff0000" },
+}
+
 local M = {}
 
 --- @class BattleshipSetupOptions
@@ -13,6 +18,11 @@ M.setup = function(options)
     local seed = options.seed or os.time()
     math.randomseed(seed)
     vim.api.nvim_create_augroup(constants.BATTLESHIP_AUTO_GROUP, { clear = true })
+    local ns = vim.api.nvim_create_namespace(constants.BATTLESHIP_NAMESPACE)
+
+    for group, hi in pairs(highlight_groups) do
+        vim.api.nvim_set_hl(ns, group, hi)
+    end
 end
 
 return M

@@ -1,3 +1,5 @@
+local constants = require("battleship.constants")
+
 ---@class Interface
 ---@field buf number
 ---@field win number
@@ -49,6 +51,10 @@ function Interface:show()
         vim.api.nvim_win_close(self.win, true)
     end
     self.win = vim.api.nvim_open_win(self.buf, true, self.opts)
+    vim.api.nvim_win_set_hl_ns(
+        self.win,
+        vim.api.nvim_create_namespace(constants.BATTLESHIP_NAMESPACE)
+    )
 end
 
 ---Resizes the interface
