@@ -50,6 +50,15 @@ function Game:configure()
     self.boards.player.attack:set_opposite(self.boards.cpu.defense)
     self.boards.cpu.attack:set_opposite(self.boards.player.defense)
 
+    vim.api.nvim_create_autocmd("VimResized", {
+        group = constants.BATTLESHIP_AUTO_GROUP,
+        callback = function()
+            vim.schedule(function()
+                self:on_resize()
+            end)
+        end,
+    })
+
     vim.api.nvim_create_autocmd("BufLeave", {
         buffer = self.ui.prompt.buf,
         callback = function()
