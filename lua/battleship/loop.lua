@@ -3,6 +3,7 @@ local DefenseBoard = require("battleship.boards.defense")
 local BoardUI = require("battleship.ui.board")
 local PromptUI = require("battleship.ui.prompt")
 local LogUI = require("battleship.ui.log")
+local AIFactory = require("battleship.ais.factory")
 
 local constants = require("battleship.constants")
 
@@ -11,6 +12,7 @@ local constants = require("battleship.constants")
 ---@field boards { player: { attack: AttackBoard, defense: DefenseBoard }, cpu: { attack: AttackBoard, defense: DefenseBoard } }
 ---@field is_player_turn boolean
 ---@field ui { board: BoardInterface, prompt: PromptInterface, log: LogInterface }
+---@field ai CpuAI
 local Game = {}
 
 ---@class GameOptions
@@ -21,7 +23,7 @@ local Game = {}
 ---@return Game
 function Game:new(options)
     options = options or {}
-    local difficulty = options.difficulty or "medium"
+    local difficulty = options.difficulty or "easy"
     local data = {
         difficulty = difficulty,
         boards = {
@@ -41,6 +43,7 @@ function Game:new(options)
             log = LogUI:new(constants.UI.LOG_DEFAULT_OPTS),
         },
     }
+    data.ai = AIFactory(difficulty, data.boards.cpu.attack)
     setmetatable(data, self)
     self.__index = self
     return data
