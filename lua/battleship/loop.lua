@@ -113,6 +113,9 @@ function Game:loop()
 
             log_ui:print("Player hit on " .. row .. tostring(col - 1))
             self:handle_hit(row, col, tostring(size))
+            if status.destroyed then
+                log_ui:print("CPU " .. constants.SHIPS_NAMES[size] .. " sunk!")
+            end
             return self:loop()
         end)
     else
@@ -134,6 +137,10 @@ function Game:loop()
         local size = status.hit
         local result = size == 0 and "miss" or "hit"
         log_ui:print("CPU " .. result .. " on " .. row .. tostring(col - 1))
+
+        if status.destroyed then
+            log_ui:print("Player " .. constants.SHIPS_NAMES[size] .. " sunk")
+        end
 
         self.is_player_turn = true
         return self:loop()
