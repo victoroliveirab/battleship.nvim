@@ -87,7 +87,6 @@ function Game:start()
 end
 
 function Game:loop()
-    local log_ui = self.ui.log
     local prompt_ui = self.ui.prompt
 
     if self.is_player_turn then
@@ -96,55 +95,60 @@ function Game:loop()
             local row = string.upper(coordinates.row)
             local col = coordinates.col + 1
             local status = attack_board:guess(row, col)
-            if not status then
-                return self:loop()
-            end
-            local size = status.hit
-            if status.game_over then
-                self:handle_hit(row, col, tostring(size))
-                return self:handle_game_over()
-            end
-            self.is_player_turn = false
-            if size == 0 then
-                log_ui:print("Player miss on " .. row .. tostring(col - 1))
-                self:handle_miss(row, col)
-                return self:loop()
-            end
-
-            log_ui:print("Player hit on " .. row .. tostring(col - 1))
-            self:handle_hit(row, col, tostring(size))
-            if status.destroyed then
-                log_ui:print("CPU " .. constants.SHIPS_NAMES[size] .. " sunk!")
-            end
-            return self:loop()
+            return self:handle_move(row, col, status)
         end)
     else
         -- For now: just pick a random spot
         local attack_board = self.boards.cpu.attack
+        local row = constants.BOARD_ROWS[math.random(1, 10)]
+        local col = math.random(1, 10)
+        local status = attack_board:guess(row, col)
+        return self:handle_move(row, col, status)
+    end
+end
 
-        local row, col, status
-        while not status do
-            row = constants.BOARD_ROWS[math.random(1, 10)]
-            col = math.random(1, 10)
-            status = attack_board:guess(row, col)
-            if status then
-                if status.game_over then
-                    return self:handle_game_over()
-                end
-            end
-        end
-
-        local size = status.hit
-        local result = size == 0 and "miss" or "hit"
-        log_ui:print("CPU " .. result .. " on " .. row .. tostring(col - 1))
-
-        if status.destroyed then
-            log_ui:print("Player " .. constants.SHIPS_NAMES[size] .. " sunk")
-        end
-
-        self.is_player_turn = true
+---Handle game end of turn
+---@param row string
+---@param col number
+---@param status HitStatus|false
+---@return nil
+function Game:handle_move(row, col, status)
+    if not status then
         return self:loop()
     end
+
+    local board_ui = self.ui.board
+    local log_ui = self.ui.log
+
+    local size = status.hit
+    local attacker = self.is_player_turn and "Player" or "CPU"
+    local defender = attacker == "Player" and "CPU" or "Player"
+    local effect = size > 0 and "hit" or "miss"
+    log_ui:print(string.format("%s %s on %s%d", attacker, effect, row, col - 1))
+
+    if self.is_player_turn then
+        board_ui:update_board(row, col, effect == "hit" and tostring(size) or "~")
+    end
+
+    self.is_player_turn = not self.is_player_turn
+
+    if size == 0 then
+        return self:loop()
+    end
+
+    board_ui:update_board(row, col, tostring(size))
+
+    if status.game_over then
+        return self:handle_game_over(attacker)
+    end
+
+    if status.destroyed then
+        local terminator = attacker == "Player" and "!" or ""
+        log_ui:print(
+            string.format("%s %s sunk%s", defender, constants.SHIPS_NAMES[size], terminator)
+        )
+    end
+    return self:loop()
 end
 
 function Game:on_resize()
@@ -177,23 +181,15 @@ function Game:on_resize()
     self.ui.log:resize({ col = padding_left + board_min_width + 2, row = padding_top })
 end
 
-function Game:handle_game_over()
+---Handles game over
+---@param winner string
+function Game:handle_game_over(winner)
     local log_ui = self.ui.log
-    if self.is_player_turn then
+    if winner == "Player" then
         log_ui:print("Player wins!")
     else
         log_ui:print("CPU wins.")
     end
-end
-
-function Game:handle_miss(row, col)
-    local board_ui = self.ui.board
-    board_ui:update_board(row, col, "~")
-end
-
-function Game:handle_hit(row, col, value)
-    local board_ui = self.ui.board
-    board_ui:update_board(row, col, value)
 end
 
 function Game:close()
