@@ -139,8 +139,6 @@ function Game:handle_move(row, col, status)
         return self:loop()
     end
 
-    board_ui:update_board(row, col, tostring(size))
-
     if status.game_over then
         return self:handle_game_over(attacker)
     end
