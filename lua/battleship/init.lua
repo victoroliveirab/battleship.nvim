@@ -1,8 +1,10 @@
 local constants = require("battleship.constants")
 
 local highlight_groups = {
-    BoardHit = { fg = "#00ff00" },
-    BoardMiss = { fg = "#ff0000" },
+    PlayerBoardHit = { fg = "#00ff00" },
+    PlayerBoardMiss = { fg = "#ff0000" },
+    CPUBoardHit = { fg = "#ff0000" },
+    CPUBoardMiss = { fg = "#00ff00" },
 }
 
 local M = {}

@@ -3,6 +3,10 @@ return {
     BATTLESHIP_NAMESPACE = "BattleshipNamespace",
     ---@type string[]
     BOARD_ROWS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" },
+    CHARS_MAP = {
+        PIPE = "│",
+        DASH = "─",
+    },
     UI = {
         ---@type InterfaceOptions
         BOARD_DEFAULT_OPTS = {

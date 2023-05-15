@@ -53,6 +53,11 @@ function Game:configure()
     self.boards.player.attack:set_opposite(self.boards.cpu.defense)
     self.boards.cpu.attack:set_opposite(self.boards.player.defense)
 
+    self.ui.board:attach_boards({
+        attack = self.boards.player.attack,
+        defense = self.boards.cpu.attack,
+    })
+
     vim.api.nvim_create_autocmd("VimResized", {
         group = constants.BATTLESHIP_AUTO_GROUP,
         callback = function()
@@ -72,6 +77,11 @@ function Game:configure()
         end,
     })
 
+    vim.keymap.set({ "n", "i" }, "<C-h>", function()
+        self.ui.board:toggle()
+        self.ui.board:render()
+    end, { buffer = self.ui.prompt.buf, silent = true })
+
     vim.keymap.set("n", "<Esc>", function()
         self:close()
         return true
@@ -85,7 +95,7 @@ function Game:start()
     self.ui.board:show()
     self.ui.prompt:show()
 
-    self.ui.board:print_board(self.boards.player.attack, constants.BOARD_ROWS)
+    self.ui.board:render()
     self:loop()
 end
 
