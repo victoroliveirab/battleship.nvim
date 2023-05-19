@@ -63,9 +63,18 @@ local function centralize_string(str, length, char)
     return string.format("%s%s%s", char:rep(left_pad), str, char:rep(right_pad))
 end
 
+---Converts a value to true or false
+---@generic T
+---@param value T
+---@return boolean
+local function toboolean(value)
+    return value ~= false and value ~= nil
+end
+
 return {
     centralize_string = centralize_string,
     deepcopy = deepcopy,
     filter = filter,
     includes = includes,
+    toboolean = toboolean,
 }

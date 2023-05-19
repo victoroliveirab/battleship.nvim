@@ -1,7 +1,16 @@
+local utils = require("battleship.utils")
 ---@class CpuAI
 ---@field board AttackBoard
+---@field lower_end Coordinates? One end of the current hit ship
+---@field upper_end Coordinates? Other end of the current hit ship
+---@field hits Coordinates? Tracks hits in current situation
+---@field misses Coordinates? Tracks misses in current situation
 local BaseAI = {
     board = {},
+    lower_end = nil,
+    upper_end = nil,
+    hits = nil,
+    misses = nil,
 }
 BaseAI.__index = BaseAI
 
@@ -11,10 +20,63 @@ function BaseAI:new(options)
     return setmetatable({ board = options.board }, self)
 end
 
----Attacks a new spot on the player's board
+---Chooses a new spot on the player's board
 ---@return Coordinates
-function BaseAI:attack()
+function BaseAI:next_move()
     error("Should be implemented", 2)
+end
+
+---@param coordinates Coordinates
+---@param status HitStatus
+function BaseAI:mark_hit(coordinates, status)
+    local first_hit = not utils.toboolean(self.lower_end)
+    if first_hit then
+        self.lower_end = coordinates
+        self.upper_end = nil
+        self.hits = { coordinates }
+        self.misses = {}
+        return
+    end
+
+    table.insert(self.hits, coordinates)
+    local second_hit = not utils.toboolean(self.upper_end)
+    if second_hit then
+        ---@type Coordinates
+        local first_point = self.lower_end
+        local is_vertical = coordinates.col == first_point.col
+        if is_vertical then
+            local is_second_hit_above = coordinates.row:byte() - first_point.row:byte() < 0
+            local is_second_hit_below = not is_second_hit_above
+            self.lower_end = is_second_hit_above and coordinates or first_point
+            self.upper_end = is_second_hit_below and coordinates or first_point
+        else
+            local is_second_hit_on_the_left = coordinates.col < first_point.col
+            local is_second_hit_on_the_right = not is_second_hit_on_the_left
+            self.lower_end = is_second_hit_on_the_left and coordinates or first_point
+            self.upper_end = is_second_hit_on_the_right and coordinates or first_point
+        end
+        return
+    end
+end
+
+function BaseAI:mark_miss(coordinates)
+    if self.misses then
+        table.insert(self.misses, coordinates)
+    end
+end
+
+function BaseAI:mark_destroyed()
+    self.lower_end = nil
+    self.upper_end = nil
+    self.hits = nil
+    self.misses = nil
+end
+
+---Updates the direction in which the AI should make the next guess
+---@param direction "x"|"y"
+---@return nil
+function BaseAI:update_direction(direction)
+    self.direction = direction
 end
 
 return BaseAI
