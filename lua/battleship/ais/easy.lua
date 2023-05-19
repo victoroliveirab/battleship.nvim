@@ -1,18 +1,21 @@
 local BaseAI = require("battleship.ais")
-local constants = require("battleship.constants")
+local ai_helpers = require("battleship.ais.helpers")
 
 ---@class EasyAI: CpuAI
 local EasyAI = {}
 setmetatable(EasyAI, { __index = BaseAI })
 
+---Creates a new AI of difficulty easy
+---@param options { board: Board }
+function EasyAI:new(options)
+    local instance = BaseAI:new(options)
+    setmetatable(instance, { __index = EasyAI })
+    return instance
+end
+
 ---@return Coordinates
-function EasyAI:attack()
-    local row = constants.BOARD_ROWS[math.random(1, 10)]
-    local col = math.random(1, 10)
-    return {
-        row = row,
-        col = col,
-    }
+function EasyAI:next_move()
+    return ai_helpers.get_random_point()
 end
 
 return EasyAI
