@@ -64,6 +64,22 @@ local function includes(arr, element, equality_fn)
     return false
 end
 
+---Concats two arrays
+---@generic T
+---@param arr1 T[]
+---@param arr2 T[]
+---@return T[]
+local function concat(arr1, arr2)
+    local arr = {}
+    for _, element in ipairs(arr1) do
+        table.insert(arr, element)
+    end
+    for _, element in ipairs(arr2) do
+        table.insert(arr, element)
+    end
+    return arr
+end
+
 ---Creates an equal padding on both sizes of the string
 ---@param str string the uncentered string
 ---@param length integer the final length of the string
@@ -87,6 +103,7 @@ end
 
 return {
     centralize_string = centralize_string,
+    concat = concat,
     deepcopy = deepcopy,
     filter = filter,
     includes = includes,
