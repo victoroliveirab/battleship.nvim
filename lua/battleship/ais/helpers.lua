@@ -20,7 +20,7 @@ end
 ---@param coordinate Coordinates
 ---@return boolean? is_valid Whether coordinate is valid
 local is_valid_point = function(coordinate)
-    return get_row_index(coordinate.row) and coordinate.col > 0 and coordinate.col <= 10
+    return get_row_index(coordinate.row) and coordinate.col >= 0 and coordinate.col < 10
 end
 
 ---Gets a random point on the board
