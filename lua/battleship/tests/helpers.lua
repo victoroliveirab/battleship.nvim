@@ -2,8 +2,6 @@
 ---@param expected any
 ---@param actual any
 local assert_equals = function(expected, actual)
-    print(vim.inspect(expected))
-    print(vim.inspect(actual))
     assert(
         expected == actual,
         string.format("Expected %s, but actual is %s", tostring(expected), tostring(actual))
