@@ -5,6 +5,9 @@ local Board = require("battleship.boards")
 local DefenseBoard = {}
 setmetatable(DefenseBoard, { __index = Board })
 
+---Creates a new instance of a defense board
+---@param opts BoardOptions?
+---@return DefenseBoard
 function DefenseBoard:new(opts)
     local instance = Board:new(vim.tbl_extend("force", opts, { empty = false }))
     instance = vim.tbl_extend("force", instance, {

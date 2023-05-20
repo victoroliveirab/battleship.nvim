@@ -8,9 +8,11 @@ local AttackBoard = {
 setmetatable(AttackBoard, { __index = Board })
 
 ---Creates a new instance of a attack board
----@return Board
+---@param opts BoardOptions?
+---@return AttackBoard
 function AttackBoard:new(opts)
-    local instance = Board:new(vim.tbl_extend("force", opts, { empty = true }))
+    local instance = Board:new(vim.tbl_extend("force", opts or {}, { empty = true }))
+    instance = vim.tbl_extend("force", instance, { opposite = nil })
     setmetatable(instance, { __index = AttackBoard })
     return instance
 end
