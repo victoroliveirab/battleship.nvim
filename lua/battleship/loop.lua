@@ -111,7 +111,6 @@ function Game:loop()
             return self:handle_move(point, status)
         end)
     else
-        -- For now: just pick a random spot
         local attack_board = self.boards.cpu.attack
         local coordinates = self.ai:next_move()
         local point = Point.create(coordinates)
@@ -157,7 +156,7 @@ function Game:handle_move(point, status)
     end
 
     if attacker == "CPU" then
-        self.ai:mark_hit(point, status)
+        self.ai:mark_hit(point)
     end
 
     if status.destroyed then
@@ -165,6 +164,9 @@ function Game:handle_move(point, status)
         log_ui:print(
             string.format("%s %s sunk%s", defender, constants.SHIPS_NAMES[size], terminator)
         )
+        if attacker == "CPU" then
+            self.ai:mark_destroyed()
+        end
     end
     return self:loop()
 end
