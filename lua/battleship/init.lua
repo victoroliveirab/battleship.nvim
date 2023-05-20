@@ -11,6 +11,7 @@ local M = {}
 
 --- @class BattleshipSetupOptions
 --- @field seed number
+---@field run_tests boolean whether it should the test suit
 
 --- Setup function
 --- @param options BattleshipSetupOptions?
@@ -24,6 +25,10 @@ M.setup = function(options)
 
     for group, hi in pairs(highlight_groups) do
         vim.api.nvim_set_hl(ns, group, hi)
+    end
+
+    if options.run_tests then
+        require("battleship.tests")
     end
 end
 
