@@ -1,3 +1,5 @@
+local utils = require("battleship.utils")
+
 ---Tests equality and raises a formatted error on failure
 ---@param expected any
 ---@param actual any
@@ -5,6 +7,24 @@ local assert_equals = function(expected, actual)
     assert(
         expected == actual,
         string.format("Expected %s, but actual is %s", tostring(expected), tostring(actual))
+    )
+end
+
+---Tests if an element is nil
+---@param element any
+local assert_is_nil = function(element)
+    assert(element == nil, string.format("Expected %s to be nil", tostring(element)))
+end
+
+---Tests if an element belong to an array
+---@generic T
+---@param arr T[]
+---@param element T
+---@param equality_fn fun(a: T, b: T): boolean
+local assert_belongs = function(arr, element, equality_fn)
+    assert(
+        utils.includes(arr, element, equality_fn),
+        string.format("Expected %s to be part of array", tostring(element))
     )
 end
 
@@ -48,9 +68,21 @@ local assert_not_equals = function(expected, actual)
     )
 end
 
+---Runs test multiple times
+---@param test_case fun(): nil
+---@param times integer
+local run_multiple = function(test_case, times)
+    for _ = 1, times do
+        test_case()
+    end
+end
+
 return {
+    assert_belongs = assert_belongs,
     assert_equals = assert_equals,
     assert_equals_each = assert_equals_each,
     assert_equals_array_elements = assert_equals_array_elements,
+    assert_is_nil = assert_is_nil,
     assert_not_equals = assert_not_equals,
+    run_multiple = run_multiple,
 }
