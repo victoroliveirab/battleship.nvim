@@ -41,8 +41,8 @@ function BaseAI:mark_hit(point)
     end
 
     table.insert(self.hits, point)
-    local second_hit = not utils.toboolean(self.upper_end)
-    if second_hit then
+    local is_second_hit = not utils.toboolean(self.upper_end)
+    if is_second_hit then
         ---@type Point
         local first_point = self.lower_end
         local is_vertical = point.col == first_point.col
@@ -60,6 +60,32 @@ function BaseAI:mark_hit(point)
         end
         return
     end
+
+    if self.direction == "x" then
+        local is_new_hit_on_lower_end_left = point.col < self.lower_end.col
+        local is_new_hit_on_upper_end_right = point.col > self.upper_end.col
+        if is_new_hit_on_lower_end_left then
+            self.lower_end = point
+        end
+        if is_new_hit_on_upper_end_right then
+            self.upper_end = point
+        end
+        return
+    end
+
+    if self.direction == "y" then
+        local is_new_hit_above_lower_end = point.row_index < self.lower_end.row_index
+        local is_new_hit_below_upper_end = point.row_index > self.upper_end.row_index
+        if is_new_hit_above_lower_end then
+            self.lower_end = point
+        end
+        if is_new_hit_below_upper_end then
+            self.upper_end = point
+        end
+        return
+    end
+
+    error("Direction should be set by this moment", 2)
 end
 
 function BaseAI:mark_miss(point)
