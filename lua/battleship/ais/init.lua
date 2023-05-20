@@ -5,12 +5,14 @@ local utils = require("battleship.utils")
 ---@field upper_end Point? Other end of the current hit ship
 ---@field hits Point? Tracks hits in current situation
 ---@field misses Point? Tracks misses in current situation
+---@field direction "x"|"y"|nil
 local BaseAI = {
     board = {},
     lower_end = nil,
     upper_end = nil,
     hits = nil,
     misses = nil,
+    direction = nil,
 }
 BaseAI.__index = BaseAI
 
@@ -27,14 +29,14 @@ function BaseAI:next_move()
 end
 
 ---@param point Point
----@param status HitStatus
-function BaseAI:mark_hit(point, status)
+function BaseAI:mark_hit(point)
     local first_hit = not utils.toboolean(self.lower_end)
     if first_hit then
         self.lower_end = point
         self.upper_end = nil
         self.hits = { point }
         self.misses = {}
+        self.direction = nil
         return
     end
 
@@ -44,6 +46,7 @@ function BaseAI:mark_hit(point, status)
         ---@type Point
         local first_point = self.lower_end
         local is_vertical = point.col == first_point.col
+        self:update_direction(is_vertical and "y" or "x")
         if is_vertical then
             local is_second_hit_above = point.row:byte() - first_point.row:byte() < 0
             local is_second_hit_below = not is_second_hit_above
@@ -70,6 +73,7 @@ function BaseAI:mark_destroyed()
     self.upper_end = nil
     self.hits = nil
     self.misses = nil
+    self.direction = nil
 end
 
 ---Updates the direction in which the AI should make the next guess
