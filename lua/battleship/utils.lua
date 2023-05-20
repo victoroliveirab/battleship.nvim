@@ -17,11 +17,25 @@ local function deepcopy(orig)
     end
     return copy
 end
+---Maps an array
+---@generic T
+---@generic P
+---@param arr T[]
+---@param predicate fun(element: T): P
+---@return P[]
+local function map(arr, predicate)
+    local mapped_arr = {}
+    for _, element in ipairs(arr) do
+        table.insert(mapped_arr, predicate(element))
+    end
+    return mapped_arr
+end
 
 ---Filters an array
 ---@generic T
 ---@param arr T[]
 ---@param predicate fun(element: T): boolean
+---@return T[]
 local function filter(arr, predicate)
     local filtered_arr = {}
     for _, element in ipairs(arr) do
@@ -76,5 +90,6 @@ return {
     deepcopy = deepcopy,
     filter = filter,
     includes = includes,
+    map = map,
     toboolean = toboolean,
 }
