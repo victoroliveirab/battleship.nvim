@@ -23,10 +23,11 @@ function AttackBoard:set_opposite(board)
 end
 
 ---Makes a guess from the attack board on the defense board counterpart
----@param row string Row's letter
----@param col number Column's index
+---@param point Point
 ---@return HitStatus | false
-function AttackBoard:guess(row, col)
+function AttackBoard:guess(point)
+    local row = point.row
+    local col = point.col_index
     local spot = self.state[row][col]
     if spot ~= "." then -- Spot already hit
         return false

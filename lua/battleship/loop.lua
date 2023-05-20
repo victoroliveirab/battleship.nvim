@@ -4,6 +4,7 @@ local BoardUI = require("battleship.ui.board")
 local PromptUI = require("battleship.ui.prompt")
 local LogUI = require("battleship.ui.log")
 local AIFactory = require("battleship.ais.factory")
+local Point = require("battleship.boards.point")
 
 local constants = require("battleship.constants")
 
@@ -23,7 +24,7 @@ local Game = {}
 ---@return Game
 function Game:new(options)
     options = options or {}
-    local difficulty = options.difficulty or "easy"
+    local difficulty = options.difficulty or "medium"
     local data = {
         difficulty = difficulty,
         boards = {
@@ -105,52 +106,58 @@ function Game:loop()
     if self.is_player_turn then
         local attack_board = self.boards.player.attack
         prompt_ui:read(function(coordinates)
-            local row = string.upper(coordinates.row)
-            local col = coordinates.col + 1
-            local status = attack_board:guess(row, col)
-            return self:handle_move(row, col, status)
+            local point = Point.create(coordinates)
+            local status = attack_board:guess(point)
+            return self:handle_move(point, status)
         end)
     else
         -- For now: just pick a random spot
         local attack_board = self.boards.cpu.attack
-        local row = constants.BOARD_ROWS[math.random(1, 10)]
-        local col = math.random(1, 10)
-        local status = attack_board:guess(row, col)
-        return self:handle_move(row, col, status)
+        local coordinates = self.ai:next_move()
+        local point = Point.create(coordinates)
+        local status = attack_board:guess(point)
+        return self:handle_move(point, status)
     end
 end
 
 ---Handle game end of turn
----@param row string
----@param col number
+---@param point Point
 ---@param status HitStatus|false
 ---@return nil
-function Game:handle_move(row, col, status)
+function Game:handle_move(point, status)
     if not status then
         return self:loop()
     end
 
     local board_ui = self.ui.board
     local log_ui = self.ui.log
+    local cpu_ai = self.ai
 
     local size = status.hit
     local attacker = self.is_player_turn and "Player" or "CPU"
     local defender = attacker == "Player" and "CPU" or "Player"
     local effect = size > 0 and "hit" or "miss"
-    log_ui:print(string.format("%s %s on %s%d", attacker, effect, row, col - 1))
+    log_ui:print(string.format("%s %s on %s%d", attacker, effect, point.row, point.col))
 
     if self.is_player_turn then
-        board_ui:update_board(row, col, effect == "hit" and tostring(size) or "~")
+        board_ui:update_board(point, effect == "hit" and tostring(size) or "~")
     end
 
     self.is_player_turn = not self.is_player_turn
 
     if size == 0 then
+        if attacker == "CPU" then
+            cpu_ai:mark_miss(point)
+        end
         return self:loop()
     end
 
     if status.game_over then
         return self:handle_game_over(attacker)
+    end
+
+    if attacker == "CPU" then
+        self.ai:mark_hit(point, status)
     end
 
     if status.destroyed then

@@ -1,4 +1,5 @@
 local Interface = require("battleship.ui")
+local Point = require("battleship.boards.point")
 
 local constants = require("battleship.constants")
 
@@ -20,24 +21,12 @@ setmetatable(BoardInterface, { __index = Interface })
 
 local padding = 3
 
----Get row index
----@param row string
----@return integer? row Row's index
-local get_row_index = function(row)
-    for index, value in ipairs(constants.BOARD_ROWS) do
-        if value == row then
-            return index
-        end
-    end
-end
-
 ---Get buffer coordinates by board's row and col
----@param row string
----@param col integer
+---@param point Point
 ---@return { row: integer, col: integer }
-local get_buffer_coordinates = function(row, col)
-    local row_index = get_row_index(row) + 1
-    local col_index = (padding + #constants.CHARS_MAP.PIPE) * col + 1
+local get_buffer_coordinates = function(point)
+    local row_index = point.row_index + 1
+    local col_index = (padding + #constants.CHARS_MAP.PIPE) * point.col_index + 1
     return { row = row_index, col = col_index }
 end
 
@@ -102,7 +91,8 @@ function BoardInterface:render()
             board_lines[index + 1] =
                 string.format("%s %s %s", board_lines[index + 1], value, constants.CHARS_MAP.PIPE)
             if value ~= "." then
-                local indexes = get_buffer_coordinates(row, col_index)
+                local point = Point.create({ row = row, col = col_index - 1 })
+                local indexes = get_buffer_coordinates(point)
                 table.insert(
                     highlights,
                     vim.tbl_extend("error", indexes, { group = value == "~" and miss_hl or hit_hl })
@@ -127,12 +117,11 @@ function BoardInterface:toggle()
 end
 
 ---Updates specific part of the buffer
----@param row string
----@param col number
+---@param point Point
 ---@param value string
 ---@return nil
-function BoardInterface:update_board(row, col, value)
-    local indexes = get_buffer_coordinates(row, col)
+function BoardInterface:update_board(point, value)
+    local indexes = get_buffer_coordinates(point)
     local row_index = indexes.row
     local col_index = indexes.col
     vim.api.nvim_buf_set_text(self.buf, row_index, col_index, row_index, col_index + 1, { value })
