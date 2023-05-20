@@ -64,6 +64,20 @@ local function includes(arr, element, equality_fn)
     return false
 end
 
+---Checks if every element of an array satisfies the predicate function
+---@generic T
+---@param arr T[]
+---@param predicate fun(element: T): boolean
+---@return boolean
+local function every(arr, predicate)
+    for _, value in ipairs(arr) do
+        if not predicate(value) then
+            return false
+        end
+    end
+    return true
+end
+
 ---Concats two arrays
 ---@generic T
 ---@param arr1 T[]
@@ -105,6 +119,7 @@ return {
     centralize_string = centralize_string,
     concat = concat,
     deepcopy = deepcopy,
+    every = every,
     filter = filter,
     includes = includes,
     map = map,
