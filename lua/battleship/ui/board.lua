@@ -7,15 +7,12 @@ local rows = constants.BOARD_ROWS
 local ns = vim.api.nvim_create_namespace(constants.BATTLESHIP_NAMESPACE)
 
 ---@class BoardInterface: Interface
----@field board { attack: AttackBoard, defense: AttackBoard }
+---@field boards { attack: AttackBoard, defense: AttackBoard }
 local BoardInterface = {
     min_width = 45,
     min_height = 20,
     current_board = "player",
-    boards = {
-        attack = {},
-        defense = {},
-    },
+    boards = {},
 }
 setmetatable(BoardInterface, { __index = Interface })
 
@@ -112,8 +109,17 @@ function BoardInterface:render()
     self:highlight(highlights)
 end
 
+---Set board to show
+---@param board "player"|"cpu"
+function BoardInterface:set_board(board)
+    self.current_board = board
+    self:update_title(
+        self.current_board == "player" and self.boards.attack.name or self.boards.defense.name
+    )
+end
+
 function BoardInterface:toggle()
-    self.current_board = self.current_board == "player" and "cpu" or "player"
+    self:set_board(self.current_board == "cpu" and "player" or "cpu")
 end
 
 ---Updates specific part of the buffer
@@ -139,7 +145,13 @@ end
 ---@param title string
 ---@return nil
 function BoardInterface:update_title(title)
-    vim.api.nvim_win_set_config(self.win, { title = title })
+    vim.api.nvim_win_set_config(
+        self.win,
+        { title = string.format(" %s ", title), title_pos = "center" }
+    )
+    -- For some reason, after the above call we have to reset the hl group
+    -- Perhaps some default option is assumed on set_config?
+    self:_set_hl_group()
 end
 
 return BoardInterface

@@ -139,6 +139,10 @@ function Game:handle_move(point, status)
     log_ui:print(string.format("%s %s on %s%d", attacker, effect, point.row, point.col))
 
     if self.is_player_turn then
+        if self.ui.board.current_board ~= "player" then
+            self.ui.board:set_board("player")
+            self.ui.board:render()
+        end
         board_ui:update_board(point, effect == "hit" and tostring(size) or "~")
     end
 

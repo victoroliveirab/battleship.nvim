@@ -51,6 +51,10 @@ function Interface:show()
         vim.api.nvim_win_close(self.win, true)
     end
     self.win = vim.api.nvim_open_win(self.buf, true, self.opts)
+    self:_set_hl_group()
+end
+
+function Interface:_set_hl_group()
     vim.api.nvim_win_set_hl_ns(
         self.win,
         vim.api.nvim_create_namespace(constants.BATTLESHIP_NAMESPACE)
