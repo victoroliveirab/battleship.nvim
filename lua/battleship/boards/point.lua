@@ -38,15 +38,28 @@ Point.is_valid = function(point)
         and point.col_index <= 10
 end
 
+---Checks if two points are in the same row
+---@param point_a Point
+---@param point_b Point
+---@return boolean
+Point.are_same_row = function(point_a, point_b)
+    return point_a.row == point_b.row and point_a.row_index == point_b.row_index
+end
+
+---Checks if two points are in the same col
+---@param point_a Point
+---@param point_b Point
+---@return boolean
+Point.are_same_col = function(point_a, point_b)
+    return point_a.col == point_b.col and point_a.col_index == point_b.col_index
+end
+
 ---Checks if two points are the same
 ---@param point_a Point
 ---@param point_b Point
 ---@return boolean
 Point.are_equal = function(point_a, point_b)
-    return point_a.row == point_b.row
-        and point_a.col == point_b.col
-        and point_a.row_index == point_b.row_index
-        and point_a.col_index == point_b.col_index
+    return Point.are_same_row(point_a, point_b) and Point.are_same_col(point_a, point_b)
 end
 
 return Point
