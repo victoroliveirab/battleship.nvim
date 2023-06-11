@@ -57,6 +57,7 @@ function Game:configure()
     self.ui.board:attach_boards({
         attack = self.boards.player.attack,
         defense = self.boards.cpu.attack,
+        player = self.boards.player.defense,
     })
 
     vim.api.nvim_create_autocmd("VimResized", {
@@ -208,6 +209,7 @@ end
 ---Handles game over
 ---@param winner string
 function Game:handle_game_over(winner)
+    -- TODO: redirect to cpu board if they win
     local log_ui = self.ui.log
     if winner == "Player" then
         log_ui:print("Player wins!")

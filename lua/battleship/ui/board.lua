@@ -5,9 +5,10 @@ local constants = require("battleship.constants")
 
 local rows = constants.BOARD_ROWS
 local ns = vim.api.nvim_create_namespace(constants.BATTLESHIP_NAMESPACE)
+local PIPE = constants.CHARS_MAP.PIPE
 
 ---@class BoardInterface: Interface
----@field boards { attack: AttackBoard, defense: AttackBoard }
+---@field boards { attack: AttackBoard, defense: AttackBoard, player: DefenseBoard }
 local BoardInterface = {
     min_width = 45,
     min_height = 20,
@@ -23,7 +24,7 @@ local padding = 3
 ---@return { row: integer, col: integer }
 local get_buffer_coordinates = function(point)
     local row_index = point.row_index + 1
-    local col_index = (padding + #constants.CHARS_MAP.PIPE) * point.col_index + 1
+    local col_index = (padding + #PIPE) * point.col_index + 1
     return { row = row_index, col = col_index }
 end
 
@@ -42,11 +43,12 @@ function BoardInterface:new(opts)
 end
 
 ---Attaches boards to interface
----@param params { attack: AttackBoard, defense: AttackBoard }
+---@param params { attack: AttackBoard, defense: AttackBoard, player: DefenseBoard }
 ---@return nil
 function BoardInterface:attach_boards(params)
     self.boards.attack = params.attack
     self.boards.defense = params.defense
+    self.boards.player = params.player
 end
 
 ---Wipe buffer and write to it
@@ -72,21 +74,34 @@ function BoardInterface:highlight(coordinates)
     end
 end
 
+function BoardInterface:_format_board_cell(row, col_index, value)
+    local is_player_attack = self.current_board == "player"
+    if is_player_attack or value == "~" then
+        return value
+    end
+
+    local player_board_cell = self.boards.player.state[row][col_index]
+    if player_board_cell ~= "." then
+        return player_board_cell
+    end
+    return value
+end
+
 ---Renders the current board to the buffer
 ---@return nil
 function BoardInterface:render()
     local hit_hl = self.current_board == "player" and "PlayerBoardHit" or "CPUBoardHit"
     local miss_hl = self.current_board == "player" and "PlayerBoardMiss" or "CPUBoardMiss"
     local board = self.current_board == "player" and self.boards.attack or self.boards.defense
-    local board_lines = { string.format("   %s", constants.CHARS_MAP.PIPE) }
+    local board_lines = { string.format("   %s", PIPE) }
     local highlights = {}
     for index, row in ipairs(rows) do
-        board_lines[1] =
-            string.format("%s %d %s", board_lines[1], index - 1, constants.CHARS_MAP.PIPE)
-        table.insert(board_lines, string.format(" %s %s", row, constants.CHARS_MAP.PIPE))
+        board_lines[1] = string.format("%s %d %s", board_lines[1], index - 1, PIPE)
+        table.insert(board_lines, string.format(" %s %s", row, PIPE))
         for col_index, value in ipairs(board.state[row]) do
+            local formatted_value = self:_format_board_cell(row, col_index, value)
             board_lines[index + 1] =
-                string.format("%s %s %s", board_lines[index + 1], value, constants.CHARS_MAP.PIPE)
+                string.format("%s %s %s", board_lines[index + 1], formatted_value, PIPE)
             if value ~= "." then
                 local point = Point.create({ row = row, col = col_index - 1 })
                 local indexes = get_buffer_coordinates(point)
