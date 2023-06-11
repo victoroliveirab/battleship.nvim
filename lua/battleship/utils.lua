@@ -115,6 +115,26 @@ local function toboolean(value)
     return value ~= false and value ~= nil
 end
 
+---Split a string by token
+---@param str string the input
+---@param seq string the split token
+---@param iter boolean? whether it should return an iterator
+---@return fun(): (string, ...)|string[]
+local function split(str, seq, iter)
+    seq = seq or "%s"
+    iter = iter or false
+    local pattern = string.format("[^%s]+", seq)
+    local iterator = string.gmatch(str, "(" .. pattern .. ")()")
+    if iter then
+        return iterator
+    end
+    local list = {}
+    for el in iterator do
+        table.insert(list, el)
+    end
+    return list
+end
+
 return {
     centralize_string = centralize_string,
     concat = concat,
@@ -123,5 +143,6 @@ return {
     filter = filter,
     includes = includes,
     map = map,
+    split = split,
     toboolean = toboolean,
 }
