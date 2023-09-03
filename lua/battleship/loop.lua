@@ -227,12 +227,9 @@ function Game:close()
     local prompt_ui = self.ui.prompt
     local log_ui = self.ui.log
 
-    vim.api.nvim_win_close(log_ui.win, true)
-    vim.api.nvim_win_close(board_ui.win, true)
-    vim.api.nvim_win_close(prompt_ui.win, true)
-    vim.api.nvim_buf_delete(log_ui.buf, { force = true })
-    vim.api.nvim_buf_delete(board_ui.buf, { force = true })
-    vim.api.nvim_buf_delete(prompt_ui.buf, { force = true })
+    board_ui:destroy()
+    prompt_ui:destroy()
+    log_ui:destroy()
 end
 
 return Game
