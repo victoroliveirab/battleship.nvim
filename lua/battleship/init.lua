@@ -9,9 +9,9 @@ local highlight_groups = {
 
 local M = {}
 
---- @class BattleshipSetupOptions
---- @field seed number
----@field run_tests boolean whether it should the test suit
+---@class BattleshipSetupOptions
+---@field seed number?
+---@field run_tests boolean? whether it should the test suit
 
 --- Setup function
 --- @param options BattleshipSetupOptions?
