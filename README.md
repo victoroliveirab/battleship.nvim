@@ -25,8 +25,6 @@ Run the command `:Battleship` in order to start playing. A prompt will appear an
 
 ## TODO
 
-- Allow user to assemble her own defense board
 - Simulate delay to improve experience
-- Offer more setup parameters to the user
 - Add ability to save and load a match
 - Add lifetime and in-game stats
