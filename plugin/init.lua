@@ -1,3 +1,4 @@
+local AssembleInterface = require("battleship.ui.assemble")
 local Game = require("battleship.loop")
 local Stats = require("battleship.stats")
 
@@ -25,15 +26,22 @@ vim.api.nvim_create_user_command("Battleship", function(command)
     end
     Stats.init()
     local difficulty, mode = unpack(vim.split(command.args, "_"))
-    -- Ready for assemble board code
+
     if not mode or mode ~= "quick" then
         difficulty = parse_difficulty(difficulty)
-        local game = Game:new({
-            difficulty = difficulty,
+        local assemble_interface = AssembleInterface:new({
+            on_complete = function(assembled)
+                local game = Game:new({
+                    difficulty = difficulty,
+                    player_board = assembled.board.state,
+                })
+                game:start()
+            end,
         })
-        game:start()
+        assemble_interface:show()
         return
     end
+
     local game = Game:new({
         difficulty = difficulty,
     })

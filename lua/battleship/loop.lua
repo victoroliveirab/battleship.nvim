@@ -18,9 +18,10 @@ local Game = {}
 
 ---@class GameOptions
 ---@field difficulty string?
+---@field player_board table
 
 ---Creates a new game
----@param options table?
+---@param options GameOptions?
 ---@return Game
 function Game:new(options)
     options = options or {}
@@ -30,7 +31,10 @@ function Game:new(options)
         boards = {
             player = {
                 attack = AttackBoard:new({ name = "Attack Board" }),
-                defense = DefenseBoard:new({ name = "Your Board" }),
+                defense = DefenseBoard:new({
+                    name = "Your Board",
+                    initial_state = options.player_board,
+                }),
             },
             cpu = {
                 attack = AttackBoard:new({ name = "CPU Attack Board" }),

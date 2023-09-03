@@ -13,15 +13,15 @@ local Interface = {
 local Interface_mt = { __index = Interface }
 
 ---@class InterfaceOptions
----@field height number
----@field width number
----@field relative string
----@field border string
----@field row number
----@field col number
----@field style string
----@field title_pos string
----@field title string
+---@field height number?
+---@field width number?
+---@field relative string?
+---@field border string?
+---@field row number?
+---@field col number?
+---@field style string?
+---@field title_pos string?
+---@field title string?
 local default_opts = {
     height = 1,
     width = 1,

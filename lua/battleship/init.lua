@@ -5,6 +5,8 @@ local highlight_groups = {
     PlayerBoardMiss = { fg = "#ff0000" },
     CPUBoardHit = { fg = "#ff0000" },
     CPUBoardMiss = { fg = "#00ff00" },
+    AssembleAvailable = { fg = "#00ff00" },
+    AssembleUnavailable = { fg = "#ff0000" },
 }
 
 ---@class M
@@ -22,7 +24,7 @@ local M = {
 ---@field vdivider string?
 ---@field hdivider string?
 ---@field simple_dividers boolean?
----@field ships {[string]: integer}
+---@field ships {[string]: integer}?
 ---@field run_tests boolean? whether it should the test suit
 
 --- Setup function
