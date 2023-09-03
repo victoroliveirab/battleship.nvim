@@ -20,6 +20,8 @@ local Interface_mt = { __index = Interface }
 ---@field row number
 ---@field col number
 ---@field style string
+---@field title_pos string
+---@field title string
 local default_opts = {
     height = 1,
     width = 1,
@@ -28,6 +30,8 @@ local default_opts = {
     row = 1,
     col = 1,
     style = "minimal",
+    title_pos = "center",
+    title = "",
 }
 ---Creates a new interface
 ---@param opts InterfaceOptions
@@ -42,8 +46,6 @@ function Interface:new(opts)
     return instance
 end
 
--- Borders: [ "╔", "═" ,"╗", "║", "╝", "═", "╚", "║" ].
-
 ---Shows interface to the user
 ---@return nil
 function Interface:show()
@@ -51,6 +53,8 @@ function Interface:show()
         vim.api.nvim_win_close(self.win, true)
     end
     self.win = vim.api.nvim_open_win(self.buf, true, self.opts)
+    vim.wo[self.win].siso = 0
+    vim.wo[self.win].so = 0
     self:_set_hl_group()
 end
 
@@ -73,6 +77,11 @@ end
 
 function Interface:clear()
     vim.api.nvim_buf_set_lines(self.buf, 0, vim.api.nvim_buf_line_count(self.buf), true, { "" })
+end
+
+function Interface:destroy()
+    vim.api.nvim_win_close(self.win, true)
+    vim.api.nvim_buf_delete(self.buf, { force = true })
 end
 
 return Interface
