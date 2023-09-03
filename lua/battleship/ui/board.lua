@@ -34,8 +34,6 @@ end
 function BoardInterface:new(opts)
     local options = vim.tbl_extend("force", opts, {
         focusable = false,
-        title = " Attack Board ",
-        title_pos = "center",
     })
     local instance = Interface:new(options)
     setmetatable(instance, { __index = BoardInterface })
