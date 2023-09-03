@@ -3,6 +3,18 @@ return {
     BATTLESHIP_NAMESPACE = "BattleshipNamespace",
     ---@type string[]
     BOARD_ROWS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" },
+    BOARD_ROWS_INDEXES = {
+        A = 1,
+        B = 2,
+        C = 3,
+        D = 4,
+        E = 5,
+        F = 6,
+        G = 7,
+        H = 8,
+        I = 9,
+        J = 10,
+    },
     CHARS_MAP = {
         PIPE = "│",
         DASH = "─",
@@ -14,6 +26,7 @@ return {
             width = 45,
             row = 5,
             col = 10,
+            title = " Attack Board ",
         },
         ---@type InterfaceOptions
         PROMPT_DEFAULT_OPTS = {
@@ -30,5 +43,11 @@ return {
             col = 58,
         },
     },
-    SHIPS_NAMES = { [2] = "Destroyer", [3] = "Submarine", [4] = "Battleship", [5] = "Carrier" },
+    SHIPS = {
+        Destroyer = 2,
+        Submarine = 3,
+        Cruiser = 3,
+        Battleship = 4,
+        Carrier = 5,
+    },
 }
